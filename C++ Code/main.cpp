@@ -1,8 +1,11 @@
 //
 // serial.c / serial.cpp
 // A simple serial port writing example
-// Written by Ted Burke - last updated 13-2-2013
+// Serial communication set-up written by Ted Burke - last updated 13-2-2013
+//
+//
 // Edited for CNC usage by Gabriel Noya - last update 20-04-2017
+// CNC usage: everything that is not serial communication set-up.
 
 // To compile with MinGW:
 //
@@ -17,23 +20,39 @@
 //      serial.exe
 //
 
+
+
 // POR HACER:
-// Hacer que ignore el ultimo comando de ir a (0,0),
-// en lugar de eso, enviarlo al centro de la hoja.
+// Hacer el file .exe.
+// Poner datos al .exe
+// Pedir el puerto serial por consola.
 
 #include <windows.h>
 #include <stdio.h>
+#include <math.h>
+#include <string.h>
 
-void fill_array(char *arr, int size, FILE *file);
+int fill_array(char *arr, int size, FILE *file);
+bool Protection(char *bytes);
+float FindCoord(char Coordinate, char *Bytes);
+
+char FileName[50];
+char Origen[] = "G00 X0.000 Y0.000 ";
+char OrigenFixed[] = "G00 X180.000000 Y230.000000 ";
 
 
 int main(){
-    int i;
+    int i=0;
     char bytes_to_send[64];
     int bytes_to_receive[1];
     bytes_to_receive[0]=0;
     FILE *coordenadas;
-	coordenadas = fopen ( "dog.txt", "r" );
+
+    // Preguntamos al usuario por el nombre del archivo.
+
+    printf("Introduce el nombre del archivo: ");
+    gets(FileName);
+	coordenadas = fopen ( FileName, "r");
 
     // Declare variables and structures
     HANDLE hSerial;
@@ -52,7 +71,7 @@ int main(){
     }
     else fprintf(stderr, "OK\n");
 
-    // Set device parameters (38400 baud, 1 start bit,
+    // Set device parameters (38400 (9600 en mi caso) baud, 1 start bit,
     // 1 stop bit, no parity)
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
     if (GetCommState(hSerial, &dcbSerialParams) == 0)
@@ -62,6 +81,7 @@ int main(){
         return 1;
     }
 
+    // Cuidado con el Baudrate
     dcbSerialParams.BaudRate = CBR_9600;
     dcbSerialParams.ByteSize = 8;
     dcbSerialParams.StopBits = ONESTOPBIT;
@@ -92,22 +112,49 @@ int main(){
     DWORD bytes_read;
 
     if (coordenadas == NULL){
-    fputs ("Error al abrir el archivo",stderr);
-    exit (0);
+        fputs ("Error al abrir el archivo.",stderr);
+        exit (0);
     }
 
+    // Chequeamos si se cumple el margen de dibujo.
+
     while (feof(coordenadas) == 0) {
+        if(fill_array(bytes_to_send, 64, coordenadas)==0) break;
+        //Chequeamos G00 X0 Y0.
+        if(strcmp(bytes_to_send,Origen)==0){
+            memcpy(bytes_to_send,OrigenFixed, 64); // Cambiamos el G00 X0 Y0 por la instruccion de ir a nuestro origen particular.
+        }
+
+        printf("Linea %d: %s\n",i,bytes_to_send);
+        if(!Protection(bytes_to_send)){
+            printf("La instruccion excede las coordenadas margen. Revise la linea indicada.\n\n");
+            return 0;
+        }
+        i++;
+    }
+    system("cls");
+    printf("Archivo correcto.\n\n");
+    i=0;
+
+    // Retornamos el puntero al comienzo del archivo.
+    rewind(coordenadas);
+
+
+    while (feof(coordenadas) == 0) {
+            // Esperamos que el arduino envie el handshake.
         do{
             ReadFile(hSerial, bytes_to_receive, 1, &bytes_read, NULL);
         }while(bytes_to_receive[0]==0);
 
-        fill_array(bytes_to_send, 64, coordenadas);
+        // Rellenamos el arreglo con la instruccion del archivo.
+        if(fill_array(bytes_to_send, 64, coordenadas)==0) break;
         printf("%s",bytes_to_send);
         printf("\n");
 
+        // Chequeamos origen.
         fprintf(stderr, "Sending bytes... ");
 
-        if(!WriteFile(hSerial, bytes_to_send, 64, &bytes_written, NULL))
+        if(!WriteFile(hSerial, bytes_to_send, 64, &bytes_written, NULL)) // Se manda el arreglo, elemento por elemento.
         {
             fprintf(stderr, "Error\n");
             CloseHandle(hSerial);
@@ -118,12 +165,14 @@ int main(){
         bytes_to_receive[0]=0;
     }
 
+
+
     fprintf(stderr, "Done. \n");
 
 	fclose (coordenadas);
 
     // Close serial port
-    fprintf(stderr, "Closing serial port...");
+    fprintf(stderr, "Closing serial port...\n");
     if (CloseHandle(hSerial) == 0)
     {
         fprintf(stderr, "Error\n");
@@ -136,7 +185,7 @@ int main(){
 }
 
 
-void fill_array(char *arr, int size, FILE *file){
+int fill_array(char *arr, int size, FILE *file){
 
     char aux[100] ={0};
     int i=0;
@@ -149,10 +198,11 @@ void fill_array(char *arr, int size, FILE *file){
     i=0;
 
     // Llenara el auxiliar con las coordenadas que empiecen con G0 hasta el final de linea.
-    fgets(aux, 100, file);
+    if(fgets(aux, 100, file)==NULL) return 0;
+
     while (aux[0]!='G' || aux[1]!='0'){ // if
-            fgets(aux, 100, file);
-        }
+        if(fgets(aux, 100, file)==NULL) return 0;
+    }
 
     // Llenamos el arreglo con lo que nos interesa.
     while (i<size && j<100){
@@ -164,6 +214,7 @@ void fill_array(char *arr, int size, FILE *file){
         if(aux[j]=='(' || aux[j]=='%' || aux[j]=='p'){
             break;
            }
+
         arr[i] = aux[j];
 
         if (aux[j]=='.'){
@@ -180,10 +231,72 @@ void fill_array(char *arr, int size, FILE *file){
                     break;
             arr[i+3] = aux[j+3];
 
-            i = i+3;
-            j = j+6;
+            // La instruccion G00 x0 y0 tiene 4 decimales en lugar de 6, asi que agregamos esta condicion.
+            if(arr[i-1]=='0' && arr[i]=='.' && arr[i+1]=='0' && arr[i+2]=='0' && arr[i+3]=='0'){
+                i=i+3;
+                j=j+4;
+            }
+            else{
+                i = i+3;
+                j = j+6;
+            }
         }
         i++;
         j++;
     }
+    return 1;
+}
+
+bool Protection(char *bytes){
+    float X=FindCoord('X', bytes);
+    float Y=FindCoord('Y', bytes);
+
+    // Parametros de proteccion.
+    if(X<28 || X>192 || Y<38 || Y>242){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+
+float FindCoord(char Coordinate, char *Bytes){
+  int Sign=1;                       // Signo de la coordenada.
+  int Dot=2;                        // Posicion del punto decimal. Se inicia en 2 ya que si nunca encuentra punto(Cuando buscamos GO) el numero que retornara sera el que queremos (Ver codigo y asignacion de Dot).
+  float C=0;
+  int Aux[10];
+  int i,j;
+  memset(Aux,0,sizeof(Aux));
+  i=0;
+  j=0;
+
+  while(!(Bytes[i]==Coordinate)){   // Busca la coordenada en el arreglo.
+    if(i>64){
+      return 150; // Si es un GO0 Z la proteccion fallara, por lo tanto retornamos 150 para que no falle.
+    }
+    i++;
+  }
+  i++;
+  if(Bytes[i]=='-'){               // Revisa si la coordenada es negativa.
+    Sign=-1;
+    i++;
+  }
+
+  while(!(Bytes[i]==' ')){          // Guarda los valores siguientes a la coordenada en un vector auxiliar, esto se hace para ubicar el punto decimal y sumarlo todo luego.
+    if(!(Bytes[i]=='.')){
+      Aux[j]=Bytes[i]-'0';          // Convertimos char a int (lo mismo que atoi).
+      i++;
+      j++;
+    }
+    else{
+      Dot=j;
+      i++;
+    }
+  }
+
+  for(j=0; j<sizeof(Aux); j++){   // Sumamos los valores del vector auxiliar, convirtiendo cada uno a su unidad correspondiente (Decenas, decimas, etc.)
+    C+= Aux[j]*pow(10,Dot-1);
+    Dot--;
+    }
+  return C*Sign;
 }
