@@ -1,4 +1,4 @@
-# CNC_Arduino
+﻿# CNC_Arduino
 
 
 Autor: Gabriel Noya
@@ -25,7 +25,7 @@ Asignar las constantes PrevX, PrevY y PrevZ al punto donde inicialmente se encue
 
 # CUIDADO:
 
-Mi CNC, fisicamente, trabaja con una hoja tamaño A4, sin embargo esta tiene unas limitaciones fisicas, por lo tanto hay que tener un margen de 4cm verticalmente y 3 cm horizontalmente (Esto se toma en cuenta al momento de generar el GCode).
+Mi CNC, fisicamente, trabaja con una hoja tamaño A4, sin embargo esta tiene unas limitaciones fisicas, por lo tanto hay que tener un margen de 5cm verticalmente y 2 cm horizontalmente (Esto se toma en cuenta al momento de generar el GCode).
 En caso de ignorar esta advertencia y el GCode envia una instruccion para mover el marcador a un punto fuera del margen, uno de los engranajes se romperá.
 
 

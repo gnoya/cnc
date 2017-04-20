@@ -265,7 +265,7 @@ bool Protection(char *bytes){
     float Y=FindCoord('Y', bytes);
 
     // Parametros de proteccion.
-    if(X<28 || X>192 || Y<38 || Y>242){
+    if(X<20 || X>200 || Y<50 || Y>230){
         return false;
     }
     else{

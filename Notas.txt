@@ -1,8 +1,0 @@
-Programa utilizado para la generacion del GCode:
-
-Inkscape 0.91
-
-To-Do:
-
-- Añadir especificaciones de motores, servo, etc.
-- Fotos (?)
