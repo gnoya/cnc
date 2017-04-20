@@ -35,7 +35,7 @@ int main(){
     FILE *coordenadas;
     char COMString[] = "\\\\.\\COM";
     char COMPort[10];
-    system("title CNC");
+    system("title CNC - Gabriel Noya");
     system("color 1B");
 
 /////////////// Inicio del check y setup del archivo. /////////////////
