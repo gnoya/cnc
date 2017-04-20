@@ -1,11 +1,6 @@
-// Autor: Gabriel Noya
-// Universidad Simon Bolivar
-// Ultimo edit: 20-04-2017
-
 // Posibles To-do:
 // Quitar tantas variables globales ó:
 // Quitar tantos parametros y usar las variables como globales.
-// Cambiar floats por ints en las variables donde lo amerite.
 
 // Notas:
 // Las coordenadas se encuentran en micrometros. Esto se hizo para obtener mayor precision y no se perdieran decimales al trabajar con milimetros.
@@ -24,8 +19,8 @@ int j=0;
 // X,Y,Z se refieren a las coordenadas ACTUALES durante la instruccion.
 // NextX,Y,Z se refieren a las coordenadas objetivas.
 
-float PrevX=135000;
-float PrevY=90000;
+float PrevX=149000;
+float PrevY=165000;
 float PrevZ=5000;
 float X=PrevX;
 float Y=PrevY;
@@ -40,8 +35,8 @@ float J;
 float AuxX;
 float AuxY;
 
-int posNoDraw=70; // Posicion del servo para el cual no dibuja.
-int posDraw=107; // Posicion del servo para el cual dibuja.
+int posNoDraw=90; // Posicion del servo para el cual no dibuja.
+int posDraw=130; // Posicion del servo para el cual dibuja.
 int Delay0=8;   // Delay para la instruccion G00.
 int Delay1=13;  // Delay para la instruccion G01.
 int Delay=Delay1;

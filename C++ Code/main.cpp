@@ -8,10 +8,6 @@
 // CNC usage: everything that is not serial communication set-up.
 
 
-// POR HACER:
-// Hacer el file .exe.
-// Poner datos al .exe
-
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
@@ -47,6 +43,7 @@ int main(){
 
     if (coordenadas == NULL){
         fputs ("\nError al abrir el archivo.\n",stderr);
+        system("pause >nul");
         exit (0);
     }
 
@@ -63,6 +60,7 @@ int main(){
         if(!Protection(bytes_to_send)){
             printf("\nLa instruccion excede las coordenadas margen. Revise la linea indicada.\n\n");
             printf("Las coordenadas posibles existen entre 10<X<210 y 30<Y<260\n\n");
+            system("pause >nul");
             return 0;
         }
         i++;
@@ -100,6 +98,7 @@ int main(){
     {
             fprintf(stderr, "Error\n");
             return 1;
+            system("pause >nul");
     }
     else fprintf(stderr, " OK\n");
 
@@ -110,6 +109,7 @@ int main(){
     {
         fprintf(stderr, "Error getting device state\n");
         CloseHandle(hSerial);
+        system("pause >nul");
         return 1;
     }
 
@@ -122,6 +122,7 @@ int main(){
     {
         fprintf(stderr, "Error setting device parameters\n");
         CloseHandle(hSerial);
+        system("pause >nul");
         return 1;
     }
 
@@ -135,6 +136,7 @@ int main(){
     {
         fprintf(stderr, "Error setting timeouts\n");
         CloseHandle(hSerial);
+        system("pause >nul");
         return 1;
     }
 
@@ -171,6 +173,7 @@ int main(){
         {
             fprintf(stderr, "Error\n");
             CloseHandle(hSerial);
+            system("pause >nul");
             return 1;
         }
 
@@ -198,6 +201,7 @@ int main(){
     fprintf(stderr, "OK\n");
 
     // exit normally
+    system("pause >nul");
     return 0;
 }
 
