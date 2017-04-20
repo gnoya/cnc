@@ -25,7 +25,8 @@ Asignar las constantes PrevX, PrevY y PrevZ al punto donde inicialmente se encue
 
 # CUIDADO:
 
-Mi CNC, fisicamente, trabaja con una hoja tamaño A4, sin embargo esta tiene unas limitaciones fisicas, por lo tanto hay que tener un margen de 5cm verticalmente y 2 cm horizontalmente (Esto se toma en cuenta al momento de generar el GCode).
+Mi CNC, fisicamente, trabaja con una hoja tamaño A4, sin embargo esta tiene unas limitaciones fisicas, por lo tanto hay que tener un margen de 2 cm en la parte superior, 3 cm en la parte inferior y 1 cm de cada lado restante (Esto se toma en cuenta al momento de generar el GCode).
 En caso de ignorar esta advertencia y el GCode envia una instruccion para mover el marcador a un punto fuera del margen, uno de los engranajes se romperá.
+Para evitar estos problemas, se añadio un algoritmo de proteccion al .cpp, el cual revisa el archivo antes de enviarlo por serial y si hay una coordenada fuera del margen, este te lo indicara.
 
 

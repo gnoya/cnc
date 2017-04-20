@@ -26,7 +26,7 @@ char OrigenFixed[] = "G00 X180.000000 Y230.000000 ";
 
 
 int main(){
-    int i=0;
+    int i=1;
     char bytes_to_send[64];
     int bytes_to_receive[1];
     bytes_to_receive[0]=0;
@@ -43,6 +43,7 @@ int main(){
     printf("Introduce el nombre del archivo: ");
     gets(FileName);
 	coordenadas = fopen ( FileName, "r");
+    printf("\n");
 
     if (coordenadas == NULL){
         fputs ("\nError al abrir el archivo.\n",stderr);
@@ -60,7 +61,8 @@ int main(){
 
         printf("Linea %d: %s\n",i,bytes_to_send);
         if(!Protection(bytes_to_send)){
-            printf("La instruccion excede las coordenadas margen. Revise la linea indicada.\n\n");
+            printf("\nLa instruccion excede las coordenadas margen. Revise la linea indicada.\n\n");
+            printf("Las coordenadas posibles existen entre 10<X<210 y 30<Y<260\n\n");
             return 0;
         }
         i++;
@@ -156,10 +158,13 @@ int main(){
 
         // Rellenamos el arreglo con la instruccion del archivo.
         if(fill_array(bytes_to_send, 64, coordenadas)==0) break;
-        printf("%s",bytes_to_send);
-        printf("\n");
 
         // Chequeamos origen.
+        if(strcmp(bytes_to_send,Origen)==0){
+            memcpy(bytes_to_send,OrigenFixed, 64); // Cambiamos el G00 X0 Y0 por la instruccion de ir a nuestro origen particular.
+        }
+
+        printf("%s\n",bytes_to_send);
         fprintf(stderr, "Sending bytes... ");
 
         if(!WriteFile(hSerial, bytes_to_send, 64, &bytes_written, NULL)) // Se manda el arreglo, elemento por elemento.
@@ -265,7 +270,7 @@ bool Protection(char *bytes){
     float Y=FindCoord('Y', bytes);
 
     // Parametros de proteccion.
-    if(X<20 || X>200 || Y<50 || Y>230){
+    if(X<10 || X>210 || Y<30 || Y>260){
         return false;
     }
     else{
