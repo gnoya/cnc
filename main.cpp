@@ -3,6 +3,7 @@
 // A simple serial port writing example
 // Written by Ted Burke - last updated 13-2-2013
 // Edited for CNC usage by Gabriel Noya - last update 20-04-2017
+
 // To compile with MinGW:
 //
 //      gcc -o serial.exe serial.c

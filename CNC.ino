@@ -1,3 +1,7 @@
+// Autor: Gabriel Noya
+// Universidad Simon Bolivar
+// Ultimo edit: 20-04-2017
+
 // Posibles To-do:
 // Quitar tantas variables globales ó:
 // Quitar tantos parametros y usar las variables como globales.
