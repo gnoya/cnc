@@ -7,25 +7,10 @@
 // Edited for CNC usage by Gabriel Noya - last update 20-04-2017
 // CNC usage: everything that is not serial communication set-up.
 
-// To compile with MinGW:
-//
-//      gcc -o serial.exe serial.c
-//
-// To compile with cl, the Microsoft compiler:
-//
-//      cl serial.cpp
-//
-// To run:
-//
-//      serial.exe
-//
-
-
 
 // POR HACER:
 // Hacer el file .exe.
 // Poner datos al .exe
-// Pedir el puerto serial por consola.
 
 #include <windows.h>
 #include <stdio.h>
@@ -36,7 +21,6 @@ int fill_array(char *arr, int size, FILE *file);
 bool Protection(char *bytes);
 float FindCoord(char Coordinate, char *Bytes);
 
-char FileName[50];
 char Origen[] = "G00 X0.000 Y0.000 ";
 char OrigenFixed[] = "G00 X180.000000 Y230.000000 ";
 
@@ -46,30 +30,76 @@ int main(){
     char bytes_to_send[64];
     int bytes_to_receive[1];
     bytes_to_receive[0]=0;
-    FILE *coordenadas;
 
-    // Preguntamos al usuario por el nombre del archivo.
+    char FileName[50];
+    FILE *coordenadas;
+    char COMString[] = "\\\\.\\COM";
+    char COMPort[10];
+    system("title CNC");
+    system("color 1B");
+
+/////////////// Inicio del check y setup del archivo. /////////////////
 
     printf("Introduce el nombre del archivo: ");
     gets(FileName);
 	coordenadas = fopen ( FileName, "r");
+
+    if (coordenadas == NULL){
+        fputs ("\nError al abrir el archivo.\n",stderr);
+        exit (0);
+    }
+
+    // Chequeamos si se cumple el margen de dibujo.
+
+    while (feof(coordenadas) == 0) {
+        if(fill_array(bytes_to_send, 64, coordenadas)==0) break;
+        //Chequeamos G00 X0 Y0.
+        if(strcmp(bytes_to_send,Origen)==0){
+            memcpy(bytes_to_send,OrigenFixed, 64); // Cambiamos el G00 X0 Y0 por la instruccion de ir a nuestro origen particular.
+        }
+
+        printf("Linea %d: %s\n",i,bytes_to_send);
+        if(!Protection(bytes_to_send)){
+            printf("La instruccion excede las coordenadas margen. Revise la linea indicada.\n\n");
+            return 0;
+        }
+        i++;
+    }
+    system("cls");
+    printf("Archivo correcto.\n");
+    i=0;
+
+    // Retornamos el puntero al comienzo del archivo.
+    rewind(coordenadas);
+
+/////////////// Fin del check y setup del archivo. /////////////////
+
+
+
+/////////////// Inicio del check y setup del puerto serial. /////////////////
+    printf("\n\nIntroduce el puerto COM: ");
+    gets(COMPort);
+
+    system("cls");
+
+    strcat(COMString,COMPort);
 
     // Declare variables and structures
     HANDLE hSerial;
     DCB dcbSerialParams = {0};
     COMMTIMEOUTS timeouts = {0};
 
-    // Open the highest available serial port number
+    // Opening serial port.
     fprintf(stderr, "Opening serial port...");
     hSerial = CreateFile(
-                "\\\\.\\COM3", GENERIC_READ|GENERIC_WRITE, 0, NULL,
+                COMString, GENERIC_READ|GENERIC_WRITE, 0, NULL, //    \\\\.\\COM3
                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
     if (hSerial == INVALID_HANDLE_VALUE)
     {
             fprintf(stderr, "Error\n");
             return 1;
     }
-    else fprintf(stderr, "OK\n");
+    else fprintf(stderr, " OK\n");
 
     // Set device parameters (38400 (9600 en mi caso) baud, 1 start bit,
     // 1 stop bit, no parity)
@@ -111,35 +141,13 @@ int main(){
     DWORD bytes_written2, total_bytes_written2 =0;
     DWORD bytes_read;
 
-    if (coordenadas == NULL){
-        fputs ("Error al abrir el archivo.",stderr);
-        exit (0);
-    }
-
-    // Chequeamos si se cumple el margen de dibujo.
-
-    while (feof(coordenadas) == 0) {
-        if(fill_array(bytes_to_send, 64, coordenadas)==0) break;
-        //Chequeamos G00 X0 Y0.
-        if(strcmp(bytes_to_send,Origen)==0){
-            memcpy(bytes_to_send,OrigenFixed, 64); // Cambiamos el G00 X0 Y0 por la instruccion de ir a nuestro origen particular.
-        }
-
-        printf("Linea %d: %s\n",i,bytes_to_send);
-        if(!Protection(bytes_to_send)){
-            printf("La instruccion excede las coordenadas margen. Revise la linea indicada.\n\n");
-            return 0;
-        }
-        i++;
-    }
-    system("cls");
-    printf("Archivo correcto.\n\n");
-    i=0;
-
-    // Retornamos el puntero al comienzo del archivo.
-    rewind(coordenadas);
+/////////////// Fin del check y setup del puerto serial. /////////////////
 
 
+
+/////////////// Inicio de la comunicacion con el Arduino. /////////////////
+
+    printf("Iniciando comuniacion serial.\n\n");
     while (feof(coordenadas) == 0) {
             // Esperamos que el arduino envie el handshake.
         do{
@@ -161,11 +169,15 @@ int main(){
             return 1;
         }
 
-        fprintf(stderr, "%d bytes written\n", bytes_written);
+        fprintf(stderr, "%d bytes written\n\n", bytes_written);
         bytes_to_receive[0]=0;
     }
 
+/////////////// Fin de la comunicacion con el Arduino. /////////////////
 
+
+
+/////////////// Cierre de archivo y puertos. /////////////////
 
     fprintf(stderr, "Done. \n");
 
@@ -184,6 +196,7 @@ int main(){
     return 0;
 }
 
+/////////////// Funciones. /////////////////
 
 int fill_array(char *arr, int size, FILE *file){
 
