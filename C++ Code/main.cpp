@@ -17,6 +17,10 @@
 //      serial.exe
 //
 
+// POR HACER:
+// Hacer que ignore el ultimo comando de ir a (0,0),
+// en lugar de eso, enviarlo al centro de la hoja.
+
 #include <windows.h>
 #include <stdio.h>
 
