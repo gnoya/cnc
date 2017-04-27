@@ -53,18 +53,19 @@ float d=100;            // d= distancia por paso del motor (0.1 mm).
 
 // Asignacion de pines.
 
-int Dirx=4;
-int Diry=12;
-int Stepx=7;
-int Stepy=13;
-  
+int Dirx=12; //4
+int Diry=4; //12
+int Stepx=13; //7
+int Stepy=7; //13
+int ServoPin = 11;
+
 void setup() {
   Serial.begin(9600);
   pinMode(Dirx, OUTPUT);
   pinMode(Stepx, OUTPUT);
   pinMode(Diry, OUTPUT);
   pinMode(Stepy, OUTPUT);
-  myservo.attach(11);
+  myservo.attach(ServoPin);
   myservo.write(posNoDraw);
 }
 
