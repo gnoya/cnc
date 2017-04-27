@@ -1,3 +1,10 @@
+/*
+ * Autor: Gabriel Noya
+ * Ultima fecha de edicion: 27-04-2017
+ * Fin: Proyecto de nuevo ingreso a la agrupacion CITE, de la Universidad Simon Bolivar.
+ */
+
+
 // Posibles To-do:
 // Quitar tantas variables globales ó:
 // Quitar tantos parametros y usar las variables como globales.
@@ -19,8 +26,8 @@ int j=0;
 // X,Y,Z se refieren a las coordenadas ACTUALES durante la instruccion.
 // NextX,Y,Z se refieren a las coordenadas objetivas.
 
-float PrevX=149000;
-float PrevY=165000;
+float PrevX=70000;
+float PrevY=130000;
 float PrevZ=5000;
 float X=PrevX;
 float Y=PrevY;

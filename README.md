@@ -2,8 +2,9 @@
 
 
 Autor: Gabriel Noya
+Ultima modificación: 27-04-2017
 
-Code de una maquina CNC cuya funcion es dibujar en papel cualquier imagen que se le envie desde la computadora.
+Codigo de una maquina CNC cuya funcion es dibujar en papel cualquier imagen (con no muy alta resolucion) que se le envie desde la computadora.
 
 Para el uso de esta CNC necesitamos dos archivos:
 
