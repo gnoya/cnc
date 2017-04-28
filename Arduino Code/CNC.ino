@@ -44,8 +44,8 @@ float AuxY;
 
 int posNoDraw=90; // Posicion del servo para el cual no dibuja.
 int posDraw=130; // Posicion del servo para el cual dibuja.
-int Delay0=8;   // Delay para la instruccion G00.
-int Delay1=13;  // Delay para la instruccion G01.
+int Delay0=10;   // Delay para la instruccion G00.
+int Delay1=15;  // Delay para la instruccion G01.
 int Delay=Delay1;
 int Trit[3];
 
@@ -97,6 +97,7 @@ void loop() {
   // Patch: Si el comando siguiente es solo mover el eje Z, los FindCoord() devolveran 0 y todos estos datos serán 0, por lo tanto toca mover el eje Z.
   if(NextX==0 && NextY==0 && I==0 && J==0){
     MoveZAxis(NextZ,PrevZ);
+    
     // Si no hacemos estas dos asignaciones PrevX y NextX al final del loop se volveran 0.
     NextX=PrevX;
     NextY=PrevY;
