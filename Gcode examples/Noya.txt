@@ -158,4 +158,13 @@ G01 X83.496512 Y175.302012 Z-1.000000
 G01 X83.496512 Y156.834922 Z-1.000000
 G01 X83.496512 Y156.834922 Z-1.000000
 G00 Z5.000000
-G00 Z5.000000
+(End cutting path id: path3349)
+
+
+(Footer)
+M5
+G00 X0.0000 Y0.0000
+M2
+(Using default footer. To add your own footer create file "footer" in the output dir.)
+(end)
+%
