@@ -14,6 +14,8 @@ Para el uso de esta CNC necesitamos dos archivos:
 CNC.ino es el codigo que debera ser subido al arduino.
 main.cpp es el codigo en C++ cuyo proposito es enviar por serial al Arduino las instrucciones leidas en un archivo que contenga el GCode del objeto a dibujar.
 
+Tambien necesitaremos un archivo de texto con el GCODE.
+
 # USO:
 
 El GCode se genera en un archivo de texto, y se genera utilizando el programa Inkscape a traves de una serie de pasos.
@@ -24,6 +26,7 @@ Introducir el nombre del archivo donde se encuentra el GCODE (debe estar en la m
 - Para el CNC.ino: 
 Asignar las constantes PrevX, PrevY y PrevZ al punto donde inicialmente se encuentre el marcador sobre el papel, esto se debe hacer cada vez que se suba el codigo al Arduino.
 
+Explicare mejor su uso en un documento.
 
 # CUIDADO:
 
@@ -32,3 +35,6 @@ En caso de ignorar esta advertencia y el GCode envia una instruccion para mover 
 Para evitar estos problemas, se añadio un algoritmo de proteccion al .cpp, el cual revisa el archivo antes de enviarlo por serial y si hay una coordenada fuera del margen, este te lo indicara.
 
 
+# Video de Muestra
+
+https://www.youtube.com/watch?v=n2RWLiaagFM&feature=youtu.be
